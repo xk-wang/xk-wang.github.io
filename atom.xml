@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>XK</title>
+  <icon>https://www.gravatar.com/avatar/4a844ada4cba7aee005f4edded2b07b9</icon>
+  <subtitle>为者常成，行者常至</subtitle>
+  <link href="http://xkwang.cn/atom.xml" rel="self"/>
+  
+  <link href="http://xkwang.cn/"/>
+  <updated>2021-02-22T10:01:38.591Z</updated>
+  <id>http://xkwang.cn/</id>
+  
+  <author>
+    <name>xkwang</name>
+    <email>xk_wang@qq.com</email>
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C++中的static关键字</title>
+    <link href="http://xkwang.cn/post/c39717db.html"/>
+    <id>http://xkwang.cn/post/c39717db.html</id>
+    <published>2021-02-22T00:24:14.000Z</published>
+    <updated>2021-02-22T10:01:38.591Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中char的地址</title>
+    <link href="http://xkwang.cn/post/a19b496f.html"/>
+    <id>http://xkwang.cn/post/a19b496f.html</id>
+    <published>2021-02-21T12:44:33.000Z</published>
+    <updated>2021-02-22T10:01:53.972Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++三种类型转换的区别</title>
+    <link href="http://xkwang.cn/post/158a3f9d.html"/>
+    <id>http://xkwang.cn/post/158a3f9d.html</id>
+    <published>2021-02-21T12:34:26.000Z</published>
+    <updated>2021-02-22T10:02:08.441Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++类内存字节对齐</title>
+    <link href="http://xkwang.cn/post/30f3ce8a.html"/>
+    <id>http://xkwang.cn/post/30f3ce8a.html</id>
+    <published>2021-02-21T09:56:17.000Z</published>
+    <updated>2021-02-22T10:00:06.856Z</updated>
+    
+    <content type="html"><![CDATA[<p>内存对齐的两个基本原则是首地址偏移量需要是min（对齐单位，成员字节数）的倍数，总字节数需要是对齐单位倍数。</p><a id="more"></a><p>本文内容参考 <a href="https://zhuanlan.zhihu.com/p/30007037">https://zhuanlan.zhihu.com/p/30007037</a><br>版权归<a href="https://www.zhihu.com/people/qinlibo_nlp">忆臻</a>所有。</p><h3 id="内存对齐的必要性"><a href="#内存对齐的必要性" class="headerlink" title="内存对齐的必要性"></a>内存对齐的必要性</h3><p>虽然内存以字节为单位进行保存，但处理器寄存器一次性读取数据可能按照双字节、4字节、8字节等进行读取。32位系统的存取粒度是4字节，64位系统的存取力度是8字节。考虑32位系统下从地址1开始存放一个int，那么处理器需要读取两次数据，并且经过两次移位，一次拼接完成int的读取，这些导致数据读取速度的下降。内存对齐牺牲一定的存储空间，来换取更快的内存访问速度。</p><h3 id="内存对齐规则"><a href="#内存对齐规则" class="headerlink" title="内存对齐规则"></a>内存对齐规则</h3><h4 id="对齐模数"><a href="#对齐模数" class="headerlink" title="对齐模数"></a>对齐模数</h4><ul><li>对齐模数：每个平台下的不同编译器都有自己默认的对齐模数，win 64 gcc32的默认对齐模数是8，centos64 gcc64默认对齐模数也是8。可以通过预编译命令#pragma pack(n)进行修改；</li><li>对齐单位：min（对齐模数，max（类中数据成员字节数））</li></ul><h4 id="对齐规则"><a href="#对齐规则" class="headerlink" title="对齐规则"></a>对齐规则</h4><ol><li>第一个类成员首地址offset为0，之后每个成员首地址offset是<strong>min（对齐单位，该成员字节数）的整数倍</strong>，如有需要编译器会进行字节填充；</li><li>类总字节数是<strong>对齐单位</strong>整数倍，如有需要编译器会进行字节填充。</li></ol><p>例子（win10 gcc32 环境，默认对齐模数是8）</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">B</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> x; <span class="comment">// 4 Bytes</span></span><br><span class="line">    <span class="keyword">double</span> y; <span class="comment">// 8 Bytes</span></span><br><span class="line">    <span class="keyword">char</span> z; <span class="comment">// 类B中占据8 Bytes,作为类C成员占据4 Bytes</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 4 Bytes</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">C</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    B b; <span class="comment">// 4 Bytes</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1c</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 4 Bytes</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(B)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 24 Bytes</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(C)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 32 Bytes</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>B的内存分布 24字节</p><p>| 虚表指针4字节 | x 4字节 | y 8字节 | z 1字节 <strong>填充7字节</strong> |</p><p>C的内存分布 32字节</p><p>| C的虚表指针4字节 | B的虚表指针4字节 | B::x 4字节 <strong>填充4字节</strong> | B::y 8字节 | B::z 1字节 <strong>填充7字节</strong> |</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;内存对齐的两个基本原则是首地址偏移量需要是min（对齐单位，成员字节数）的倍数，总字节数需要是对齐单位倍数。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++空白基类最优化</title>
+    <link href="http://xkwang.cn/post/7f1322f0.html"/>
+    <id>http://xkwang.cn/post/7f1322f0.html</id>
+    <published>2021-02-21T09:26:04.000Z</published>
+    <updated>2021-02-22T10:02:26.343Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中的虚函数</title>
+    <link href="http://xkwang.cn/post/fa71210a.html"/>
+    <id>http://xkwang.cn/post/fa71210a.html</id>
+    <published>2021-02-21T08:02:12.000Z</published>
+    <updated>2021-02-21T13:47:10.315Z</updated>
+    
+    <content type="html"><![CDATA[<p>待补充</p><a id="more"></a><h3 id="单继承中的虚函数"><a href="#单继承中的虚函数" class="headerlink" title="单继承中的虚函数"></a>单继承中的虚函数</h3><h3 id="多继承中的虚函数"><a href="#多继承中的虚函数" class="headerlink" title="多继承中的虚函数"></a>多继承中的虚函数</h3><h3 id="菱形继承中的虚函数"><a href="#菱形继承中的虚函数" class="headerlink" title="菱形继承中的虚函数"></a>菱形继承中的虚函数</h3><h3 id="虚继承中的虚函数"><a href="#虚继承中的虚函数" class="headerlink" title="虚继承中的虚函数"></a>虚继承中的虚函数</h3><h3 id="构造函数-析构函数vs虚函数"><a href="#构造函数-析构函数vs虚函数" class="headerlink" title="构造函数/析构函数vs虚函数"></a>构造函数/析构函数vs虚函数</h3><ul><li>构造函数不能是虚函数：存在虚函数的类都会在内存中保存一张虚表，并且类成员会多出一个虚表指针指向虚表。构造函数调用时对象没有分配内存，当然也就不存在任何成员，因此也没法得到虚表指针了，所以构造函数不能是虚函数。</li><li>析构函数可以是虚函数：在构造对象时构造一个虚表指针指向保存析构函数地址的虚表就行了。</li></ul><h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>code1</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123; <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;A0&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123; <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;A1&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">B</span> :</span> <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123; <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;B&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123; <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt; <span class="string">&quot;B1&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    B b;</span><br><span class="line">    A &amp;a=b;</span><br><span class="line">    b.f0(); <span class="comment">// B</span></span><br><span class="line">    a.f0(); <span class="comment">// B</span></span><br><span class="line">    b.f1(); <span class="comment">// B1</span></span><br><span class="line">    a.f1(); <span class="comment">// A1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="code2"><a href="#code2" class="headerlink" title="code2"></a>code2</h4><h4 id="code3"><a href="#code3" class="headerlink" title="code3"></a>code3</h4><h4 id="code4"><a href="#code4" class="headerlink" title="code4"></a>code4</h4>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;待补充&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>对象的构造与析构</title>
+    <link href="http://xkwang.cn/post/5f724a13.html"/>
+    <id>http://xkwang.cn/post/5f724a13.html</id>
+    <published>2021-02-21T07:22:05.000Z</published>
+    <updated>2021-02-22T10:02:51.602Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>decltype和auto的比较</title>
+    <link href="http://xkwang.cn/post/e85c9ea6.html"/>
+    <id>http://xkwang.cn/post/e85c9ea6.html</id>
+    <published>2021-02-20T13:21:37.000Z</published>
+    <updated>2021-02-20T13:26:45.005Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>new和malloc的区别</title>
+    <link href="http://xkwang.cn/post/c69e57ea.html"/>
+    <id>http://xkwang.cn/post/c69e57ea.html</id>
+    <published>2021-02-20T11:47:27.000Z</published>
+    <updated>2021-02-20T12:59:43.752Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中的this指针</title>
+    <link href="http://xkwang.cn/post/5082990a.html"/>
+    <id>http://xkwang.cn/post/5082990a.html</id>
+    <published>2021-02-20T09:16:53.000Z</published>
+    <updated>2021-02-20T13:00:21.913Z</updated>
+    
+    <content type="html"><![CDATA[<p>C++中this指针是隐式的成员函数参数，类似python中的self，当访问数据成员或者函数成员时就会把对象的首地址赋值给this指针。this指针指向对象存储空间的首地址，也即第一个数据成员的首地址。因此，this指针不占据对象存储空间。</p><a id="more"></a><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">location</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">this</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x1,x2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">Base b;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;&amp;b&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 0x61ff0f</span></span><br><span class="line">b.location(); <span class="comment">// 0x61ff0f</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;&amp;b.x1&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 0x61ff08</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;&amp;b.x2&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 0x61ff0c</span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;C++中this指针是隐式的成员函数参数，类似python中的self，当访问数据成员或者函数成员时就会把对象的首地址赋值给this指针。this指针指向对象存储空间的首地址，也即第一个数据成员的首地址。因此，this指针不占据对象存储空间。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++类和对象的存储结构</title>
+    <link href="http://xkwang.cn/post/8f50d358.html"/>
+    <id>http://xkwang.cn/post/8f50d358.html</id>
+    <published>2021-02-20T09:01:31.000Z</published>
+    <updated>2021-02-22T00:29:31.528Z</updated>
+    
+    <content type="html"><![CDATA[<p>等待补充</p><a id="more"></a><h4 id="C-C-存储空间结构"><a href="#C-C-存储空间结构" class="headerlink" title="C/C++存储空间结构"></a>C/C++存储空间结构</h4><div style="text-align: center"><img src="/assets/blog/8f50d358/memory.jpg" margin="0 auto" width="50%" height="50%"/></div><blockquote><p>BSS: Block Started by Symbol，意为“以符号开始的块”。在C语言中还分：未初始化的全局变量和静态变量、已初始化的全局变量和静态变量。但是在C++中没有这个区分，他们共同占用同一块内存区。代码区和数据区内存数据从可执行文件中读取。</p></blockquote><ol><li>代码区：存放CPU执行的机器指令，代码区是可共享，并且是只读的；</li><li>数据区（全局/静态存储区）：存放已初始化的全局变量、静态变量（全局和局部）、常量数据；<ul><li>BBS区：存放未初始化的全局变量和静态变量；</li><li>GVAR区：存放已经初始化的全局变量和静态变量；</li></ul></li><li>栈区：由编译器自动分配释放，存放函数的参数值、返回值和局部变量，在程序运行过程中实时分配和释放，栈区由操作系统自动管理，无须程序员手动管理；</li><li>堆区：堆是由malloc()函数分配的内存块，使用free()函数来释放内存，堆的申请释放工作由程序员控制；</li><li><strong>自由存储区</strong>：由new分配的内存块都是自由存储区，是C++中才有的抽象概念。自由存储区不是一个具体的物理概念，对应的物理存储区可能是堆区，也可能是静态存储区，需要看不同编译器new的实现方式。</li></ol><p>new和malloc的区别参考<a href="c69e57ea.html">new和malloc区别</a>。</p><h3 id="基本数据类型占据内存大小"><a href="#基本数据类型占据内存大小" class="headerlink" title="基本数据类型占据内存大小"></a>基本数据类型占据内存大小</h3><p>32、64位编译器不同数据类型占据内存字节数如下：</p><table><thead><tr><th align="center">数据类型</th><th align="center">32位</th><th align="center">64位</th></tr></thead><tbody><tr><td align="center">char</td><td align="center">1</td><td align="center">1</td></tr><tr><td align="center">short</td><td align="center">2</td><td align="center">2</td></tr><tr><td align="center">int</td><td align="center">4</td><td align="center">4</td></tr><tr><td align="center"><strong>long</strong></td><td align="center"><strong>4</strong></td><td align="center"><strong>8</strong></td></tr><tr><td align="center">long long</td><td align="center">8</td><td align="center">8</td></tr><tr><td align="center"><strong>指针</strong></td><td align="center"><strong>4</strong></td><td align="center"><strong>8</strong></td></tr><tr><td align="center">float</td><td align="center">4</td><td align="center">4</td></tr><tr><td align="center">double</td><td align="center">8</td><td align="center">8</td></tr></tbody></table><h3 id="C-类和对象的存储"><a href="#C-类和对象的存储" class="headerlink" title="C++类和对象的存储"></a>C++类和对象的存储</h3><h4 id="C-类的构成："><a href="#C-类的构成：" class="headerlink" title="C++类的构成："></a>C++类的构成：</h4><p>数据成员：非静态的内置类型、对象类型，静态数据成员<br>函数成员：非虚函数，虚函数</p><ol><li>静态数据成员占据类的存储空间，不占据对象存储空间；</li><li>内置类型占据空间<a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8D%A0%E6%8D%AE%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F">如上</a>；</li><li>对象数据类型占据空间按照类类型对齐原则；</li><li>非虚函数不占内存；</li><li>虚函数存在虚函数指针占据内存。</li></ol><blockquote><p>类类型对齐原则是指在牺牲一定空间损失的情况下，换取内存读取次数的减少。详情参考<a href="30f3ce8a.html">C++类内字节对齐</a>。</p></blockquote><p>不保存函数成员的考虑：OOP编程其中一个目的就是代码重用，相同类不同对象的函数成员没有必要给每个对象保存，放置在公共区能节省内存。对象调用成员函数时通过域作用符和函数名便能寻址，然后把对象名传递给隐式的this指针便能分辨具体调用的是哪个对象。</p><p>虚函数通过虚表实现，包含虚函数的对象有一个指向虚表的指针，这个指针占据内存。</p><p>有关this的详细介绍参考<a href="5082990a.html">this指针</a>。<br>有关虚函数的详细介绍参考<a href="fa71210a.html">虚函数</a>。</p><h4 id="空白类对象占据1字节"><a href="#空白类对象占据1字节" class="headerlink" title="空白类对象占据1字节"></a>空白类对象占据1字节</h4><p>是为了不同实例之间的区分。空白类也能实例化，为了区分每个对象需要具有不同地址，因此至少得分配1字节内存。在继承时，如果基类是空白类，那么子类继承父类的那1个字节会被优化掉，变为0，成为空白基类最优化，参见<a href="7f1322f0.html">空白基类最优化</a>。</p><h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>在win10 gcc32环境下类A占据内存8字节，类B占据内存24字节，类C占据内存32字节，类X占据内存8字节，如代码中注释。但在centos 64, gcc64环境下类A占据内存16字节，类B占据内存32字节，类C占据内存48字节，类X占据内存8字节。centos 64, gcc64环境的默认对齐系数也是8，但指针是8字节，造成了不同。</p><p>内存对齐会导致对象占据的空间比单个数据占据空间之和多，关于对象内存字节对齐，参考<a href="30f3ce8a.html">C++类内存对齐</a>。对象成员内存分布的先后顺序会影响内存对齐，虚表指针始终是对象内存空间的首元素，关于C++对象虚表的存储模型，参考<a href="fa71210a.html">C++虚函数</a>。排在第二的是从父类继承来的成员，最后是子类自己非继承、非虚表指针数据成员。</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> pack(8) <span class="comment">//win10, mingw32的默认对齐模数</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1a</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 4 Bytes</span></span><br><span class="line">    <span class="keyword">int</span> x; <span class="comment">// 4 Bytes</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">X</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> m; <span class="comment">// 这里只是声明, 没有定义, 需要类外定义(分配内存)</span></span><br><span class="line">    <span class="keyword">int</span> x;</span><br><span class="line">    <span class="keyword">char</span> y;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">int</span> X::m; <span class="comment">// 类外进行静态成员定义 否则运行时错误undefined reference</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">B</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> x; <span class="comment">// 4 Bytes</span></span><br><span class="line">    <span class="keyword">double</span> y; <span class="comment">// 8 Bytes</span></span><br><span class="line">    <span class="keyword">char</span> z; <span class="comment">// 类B中是8 Bytes,作为类C成员是4 Bytes</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 4 Bytes</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">C</span>:</span> <span class="keyword">public</span> A</span><br><span class="line">&#123;</span><br><span class="line">    B b; <span class="comment">// 4 Bytes</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">f0</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f1c</span><span class="params">()</span> </span>&#123;&#125; <span class="comment">// 4 Bytes</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(A)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 8 Bytes</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(B)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 24 Bytes</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(C)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 32 Bytes</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(X)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 8 Bytes 有无static int m无影响 m放在全局数据区</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;X::m&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 0 静态成员只进行一次初始化</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;等待补充&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中main函数参数</title>
+    <link href="http://xkwang.cn/post/50d4ff1a.html"/>
+    <id>http://xkwang.cn/post/50d4ff1a.html</id>
+    <published>2021-02-20T08:40:09.000Z</published>
+    <updated>2021-02-20T12:59:30.965Z</updated>
+    
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++访问权限控制关键字</title>
+    <link href="http://xkwang.cn/post/b61a0d65.html"/>
+    <id>http://xkwang.cn/post/b61a0d65.html</id>
+    <published>2021-02-20T05:37:33.000Z</published>
+    <updated>2021-02-20T13:00:11.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>C++权限控制关键字包含public, private,  protected。</p><a id="more"></a><h3 id="从类自身去看"><a href="#从类自身去看" class="headerlink" title="从类自身去看"></a>从类自身去看</h3><ul><li>public类内和类外均可访问</li><li>private只能类内访问（特殊情况要访问使用友元类或者友元函数）</li><li>protected只能类内访问</li></ul><h3 id="从继承关系去看"><a href="#从继承关系去看" class="headerlink" title="从继承关系去看"></a>从继承关系去看</h3><h4 id="简单情况下"><a href="#简单情况下" class="headerlink" title="简单情况下"></a>简单情况下</h4><ul><li>public属性的成员和函数都可被子类访问</li><li>private属性的成员和函数不可被子类访问</li><li>protected属性的成员和函数可以被子类访问</li></ul><p><a href="#%E4%BB%A3%E7%A0%811">实验代码</a></p><p>虽然private属性成员不能被子类访问，但是子类中存在这些成员，只是被隐藏了。<a href="#%E4%BB%A3%E7%A0%812">实验代码</a></p><h4 id="公有继承、私有继承、保护继承"><a href="#公有继承、私有继承、保护继承" class="headerlink" title="公有继承、私有继承、保护继承"></a>公有继承、私有继承、保护继承</h4><blockquote><p>子类继承父类格式 class Child: [继承权限] Base1, [继承权限]Base2, … 其中继承权限分为3种。</p></blockquote><p>三种继承方式，在子类内部，父类成员的访问级别与父类相同，改变的只是用户代码（类外）的访问级别。</p><ul><li>public继承，继承之后子类外部访问父类成员权限不变；</li><li>private继承，继承之后子类外部访问父类成员权限全部变为private;</li><li>protected继承，继承之后子类外部访问父类成员public变成protected（可以进一步被继承使用），private还是private，protected还是protected。</li></ul><p>C++的权限控制保证了一般情况下用户代码（类外）不能访问private和protected的成员，子类不能访问父类private成员，子类能够访问父类protected成员。</p><h3 id="默认权限级别"><a href="#默认权限级别" class="headerlink" title="默认权限级别"></a>默认权限级别</h3><ul><li>class默认的权限级别是private，struct默认的权限级别是public。</li><li>继承的权限级别默认是private。</li></ul><h3 id="实验代码"><a href="#实验代码" class="headerlink" title="实验代码"></a>实验代码</h3><h4 id="代码1"><a href="#代码1" class="headerlink" title="代码1"></a>代码1</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print1</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;print1 is serving!&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x1;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print2</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;print2 is serving!&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x2;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print3</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;print3 is serving!&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child1</span>:</span> <span class="keyword">public</span> Base&#123;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child2</span>:</span> <span class="keyword">public</span> Child1&#123;</span><br><span class="line"><span class="keyword">public</span>: <span class="comment">// constructor must be public</span></span><br><span class="line">Child2(<span class="keyword">int</span> x)&#123;</span><br><span class="line">x2=x3=x;</span><br><span class="line">x1=x; <span class="comment">// error</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">Child1 d1;</span><br><span class="line">d1.print3();</span><br><span class="line">d1.x3=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">d1.print1(); <span class="comment">// error, declared private here</span></span><br><span class="line">d1.x1=<span class="number">0</span>; <span class="comment">// error, declared private here</span></span><br><span class="line"></span><br><span class="line">d1.print2(); <span class="comment">// error, declared protected here</span></span><br><span class="line">d1.x2=<span class="number">0</span>; <span class="comment">// error, declared protected here</span></span><br><span class="line"></span><br><span class="line"><span class="function">Child2 <span class="title">d2</span><span class="params">(<span class="number">0</span>)</span></span>;</span><br><span class="line">d2.print2(); <span class="comment">// error</span></span><br><span class="line">d2.x2=<span class="number">0</span>; <span class="comment">// error</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="代码2"><a href="#代码2" class="headerlink" title="代码2"></a>代码2</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>&#123;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print1</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;print1 is serving!&quot;</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> x1; <span class="comment">// 4 </span></span><br><span class="line"><span class="keyword">float</span> x2; <span class="comment">// 4</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child1</span>:</span> <span class="keyword">public</span> Base&#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">Child1 d1;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(d1)&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>这里是8的原因可以参考<a href="8f50d358.html">C++类和对象的存储结构</a></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;C++权限控制关键字包含public, private,  protected。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OOP的三大特性</title>
+    <link href="http://xkwang.cn/post/d91bc6a5.html"/>
+    <id>http://xkwang.cn/post/d91bc6a5.html</id>
+    <published>2021-02-20T04:03:03.000Z</published>
+    <updated>2021-02-21T01:31:48.561Z</updated>
+    
+    <content type="html"><![CDATA[<p>面向对象编程（OOP）的三大特性：封装、继承、多态。</p><a id="more"></a><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote><p><strong>封装</strong>是指对象把自己的数据成员和对数据的操作封装在一起；<br><strong>继承</strong>是指子类（派生类）对父类（基类）的继承，子类把父类的数据和对数据的操作继承过来，同时又增添了自己的数据和对数据的操作；<br><strong>多态</strong>同一操作作用于不同对象，产生不同结果。主要体现为函数重载（静态多态，编译时确定）和虚函数（动态多态，运行时确定）。</p></blockquote><h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><ul><li>继承权限问题 参看<a href="b61a0d65.html">C++权限控制</a>；</li><li>继承带来的重写、重载、虚函数，后续介绍；</li><li>C++的多继承、菱形继承，后续补充。</li></ul><h3 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h3><ul><li>函数重载<br>相同函数名字，不同参数列表（含不同数量参数、不同种类参数）或const函数</li><li>运算符重载<br>相同的运算符作用于不同对象，产生不同结果。通过operator函数实现。</li></ul><p><strong>重写是指子类继承父类成员函数，但是对父类函数进行了重新实现，子类重写父类函数之后没办法直接访问到父类同名函数</strong></p><blockquote><p>与Java中可以通过super访问到父类不同，Java只允许单继承，因此super可以很唯一的指向父类，C++支持多继承，父类可能不止一个。因此，在C++中如果要在子类中访问父类的方法，只能用class::function()的方式进行。</p></blockquote><p>重写、重载、虚函数是设计继承需要考虑的问题。重写之后原来父类的方法子类不能访问；重载则子类可以访问父类的同名成员函数；重写会覆盖父类函数，重载则每个子类必须由自身对象进行调用，无法根据运行时进行灵活选择，因此有了虚函数的概念。</p><h3 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h3><h3 id="重写，重载，虚函数"><a href="#重写，重载，虚函数" class="headerlink" title="重写，重载，虚函数"></a>重写，重载，虚函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;面向对象编程（OOP）的三大特性：封装、继承、多态。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="C++" scheme="http://xkwang.cn/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hexo博客使用方法</title>
+    <link href="http://xkwang.cn/post/782b19c0.html"/>
+    <id>http://xkwang.cn/post/782b19c0.html</id>
+    <published>2021-02-20T03:57:23.000Z</published>
+    <updated>2021-02-20T03:59:15.518Z</updated>
+    
+    <content type="html"><![CDATA[<p>常用命令<code>hexo clean, hexo g, hexo g</code>。上传相册需要把相册保存到source/photos/ins目录下，然后在hexo根目录下运行python encode_jpg.py，实现图片压缩、缩略图生成。每次生成新的博客，在部署到github后需要运行<code>node comment.js</code>来批量化开启gitalk评论区。</p><a id="more"></a><p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;常用命令&lt;code&gt;hexo clean, hexo g, hexo g&lt;/code&gt;。上传相册需要把相册保存到source/photos/ins目录下，然后在hexo根目录下运行python encode_jpg.py，实现图片压缩、缩略图生成。每次生成新的博客，在部署到github后需要运行&lt;code&gt;node comment.js&lt;/code&gt;来批量化开启gitalk评论区。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="hexo" scheme="http://xkwang.cn/tags/hexo/"/>
+    
+  </entry>
+  
+</feed>
