@@ -286,7 +286,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>打印char a地址需要使用<code>std::cout&lt;&lt;(void*)&amp;a</code>进行，因为&amp;a类型是char<em>，对于char</em> std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此<code>std::cout&lt;&lt;&amp;a</code>会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。</p>
+        <p>打印char a地址需要使用<code>std::cout&lt;&lt;(void*)&amp;a</code>进行，因为&amp;a类型是char*，对于char* std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此<code>std::cout&lt;&lt;&amp;a</code>会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。</p>
         
           <a class="article-more-a" style="display: none;" href="/post/a19b496f.html#more">more >></a>
         

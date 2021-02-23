@@ -36,12 +36,12 @@
     <link href="http://xkwang.cn/post/a19b496f.html"/>
     <id>http://xkwang.cn/post/a19b496f.html</id>
     <published>2021-02-21T12:44:33.000Z</published>
-    <updated>2021-02-23T05:25:50.038Z</updated>
+    <updated>2021-02-23T05:49:53.332Z</updated>
     
-    <content type="html"><![CDATA[<p>打印char a地址需要使用<code>std::cout&lt;&lt;(void*)&amp;a</code>进行，因为&amp;a类型是char<em>，对于char</em> std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此<code>std::cout&lt;&lt;&amp;a</code>会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。</p><a id="more"></a><p>对于函数指针的打印也需要先类型转换成void*，因为函数指针没有对&lt;&lt;运算符重载，会导致函数指针自动转换成bool类型，从而打印1。</p>]]></content>
+    <content type="html"><![CDATA[<p>打印char a地址需要使用<code>std::cout&lt;&lt;(void*)&amp;a</code>进行，因为&amp;a类型是char*，对于char* std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此<code>std::cout&lt;&lt;&amp;a</code>会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。</p><a id="more"></a><p>对于函数指针的打印也需要先类型转换成void*，因为函数指针没有对&lt;&lt;运算符重载，会导致函数指针自动转换成bool类型，从而打印1。</p>]]></content>
     
     
-    <summary type="html">&lt;p&gt;打印char a地址需要使用&lt;code&gt;std::cout&amp;lt;&amp;lt;(void*)&amp;amp;a&lt;/code&gt;进行，因为&amp;amp;a类型是char&lt;em&gt;，对于char&lt;/em&gt; std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此&lt;code&gt;std::cout&amp;lt;&amp;lt;&amp;amp;a&lt;/code&gt;会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。&lt;/p&gt;</summary>
+    <summary type="html">&lt;p&gt;打印char a地址需要使用&lt;code&gt;std::cout&amp;lt;&amp;lt;(void*)&amp;amp;a&lt;/code&gt;进行，因为&amp;amp;a类型是char*，对于char* std::cout会认为是字符串起始地址，因此会输出从起始地址到’\0’的字符串。而char的存储空间无’\0’字符，因此&lt;code&gt;std::cout&amp;lt;&amp;lt;&amp;amp;a&lt;/code&gt;会访问到非法内存，输出乱码。如需打印地址需要进行类型转换。&lt;/p&gt;</summary>
     
     
     
