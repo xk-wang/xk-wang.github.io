@@ -25,16 +25,16 @@
     }
   </style>
   
-  <meta name="description" content="等待补充">
+  <meta name="description" content="C++内存结构分为代码区，数据区和栈区。代码区存放编译的机器指令；数据区又分为堆区和全局数据区，其中堆区存放malloc出来的内存，全局数据区存放全局变量和静态变量；栈区存放自动变量，由编译器分配和释放。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++类和对象的存储结构">
 <meta property="og:url" content="http://xkwang.cn/post/8f50d358.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="等待补充">
+<meta property="og:description" content="C++内存结构分为代码区，数据区和栈区。代码区存放编译的机器指令；数据区又分为堆区和全局数据区，其中堆区存放malloc出来的内存，全局数据区存放全局变量和静态变量；栈区存放自动变量，由编译器分配和释放。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://xkwang.cn/assets/blog/8f50d358/memory.jpg">
 <meta property="article:published_time" content="2021-02-20T09:01:31.000Z">
-<meta property="article:modified_time" content="2021-02-22T00:29:31.528Z">
+<meta property="article:modified_time" content="2021-02-25T00:38:45.717Z">
 <meta property="article:author" content="xkwang">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -209,7 +209,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>等待补充</p>
+        <p>C++内存结构分为代码区，数据区和栈区。代码区存放编译的机器指令；数据区又分为堆区和全局数据区，其中堆区存放malloc出来的内存，全局数据区存放全局变量和静态变量；栈区存放自动变量，由编译器分配和释放。</p>
 <a id="more"></a>
 
 <h4 id="C-C-存储空间结构"><a href="#C-C-存储空间结构" class="headerlink" title="C/C++存储空间结构"></a>C/C++存储空间结构</h4><div style="text-align: center">
@@ -282,10 +282,13 @@
 </tr>
 </tbody></table>
 <h3 id="C-类和对象的存储"><a href="#C-类和对象的存储" class="headerlink" title="C++类和对象的存储"></a>C++类和对象的存储</h3><h4 id="C-类的构成："><a href="#C-类的构成：" class="headerlink" title="C++类的构成："></a>C++类的构成：</h4><p>数据成员：非静态的内置类型、对象类型，静态数据成员<br>函数成员：非虚函数，虚函数</p>
+<blockquote>
+<p>静态数据成员不与任何对象绑定，即不存在隐含的this指针，存放在堆区。静态成员函数不能声明成const（没有隐含的this指针），也不能在其内部使用this指针。</p>
+</blockquote>
 <ol>
-<li>静态数据成员占据类的存储空间，不占据对象存储空间；</li>
+<li>静态数据成员不占对象存储空间；</li>
 <li>内置类型占据空间<a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8D%A0%E6%8D%AE%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F">如上</a>；</li>
-<li>对象数据类型占据空间按照类类型对齐原则；</li>
+<li>对象数据类型占据空间按照类内存对齐原则；</li>
 <li>非虚函数不占内存；</li>
 <li>虚函数存在虚函数指针占据内存。</li>
 </ol>
