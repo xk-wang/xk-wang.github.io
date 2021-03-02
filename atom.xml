@@ -150,8 +150,18 @@
     <link href="http://xkwang.cn/post/e85c9ea6.html"/>
     <id>http://xkwang.cn/post/e85c9ea6.html</id>
     <published>2021-02-20T13:21:37.000Z</published>
-    <updated>2021-02-20T13:26:45.005Z</updated>
+    <updated>2021-03-01T23:57:25.978Z</updated>
     
+    <content type="html"><![CDATA[<a id="more"></a><p>auto和decltype称为占位符，在编译时进行自动类型推断。</p><h4 id="auto使用的几点注意"><a href="#auto使用的几点注意" class="headerlink" title="auto使用的几点注意"></a>auto使用的几点注意</h4><ol><li>auto从给定初值中进行类型推断，使用auto的表达式同时完成定义和初始化；</li><li>auto支持一行语句定义多个变量，但需要类型相同。注意&amp;和*非基本数据类型； <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a;</span><br><span class="line"><span class="keyword">auto</span> b=a, &amp;c=a, d=&amp;a;<span class="comment">//b为int, c为int&amp;, d为int* </span></span><br><span class="line"><span class="keyword">auto</span> *d=&amp;a;是啥？</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> m=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> x=a, y=m, *z=&amp;m; <span class="comment">// x,y均int，但&amp;z是const int类型，error</span></span><br></pre></td></tr></table></figure></li><li>使用引用时参与初始化的是引用对象的值，而非引用对象本身； <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;a=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> b=a; <span class="comment">// b类型int而非const int &amp;</span></span><br></pre></td></tr></table></figure></li><li>auto一般会忽略顶层const，保留底层const。如果希望保留顶层const，需要自行在auto前添加const； <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;a=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> b=a; <span class="comment">// b int</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> c=a; <span class="comment">// c是const int a，const属性自己添加。</span></span><br></pre></td></tr></table></figure></li><li>设置类型为auto引用或auto指针时，初始值中的顶层const属性得到保留。 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> a=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> &amp;b=a, *c=a; <span class="comment">// b为const int &amp;, c为const int *</span></span><br></pre></td></tr></table></figure><h4 id="decltype使用的几点注意"><a href="#decltype使用的几点注意" class="headerlink" title="decltype使用的几点注意"></a>decltype使用的几点注意</h4></li></ol>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+
+&lt;p&gt;auto和decltype称为占位符，在编译时进行自动类型推断。&lt;/p&gt;
+&lt;h4 id=&quot;auto使用的几点注意&quot;&gt;&lt;a href=&quot;#auto使用的几点注意&quot; class=&quot;headerlink&quot; title=&quot;auto使用的几点注意</summary>
+      
     
     
     
