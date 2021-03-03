@@ -169,8 +169,12 @@
     <link href="http://xkwang.cn/post/c69e57ea.html"/>
     <id>http://xkwang.cn/post/c69e57ea.html</id>
     <published>2021-02-20T11:47:27.000Z</published>
-    <updated>2021-02-20T12:59:43.752Z</updated>
+    <updated>2021-03-03T23:40:23.224Z</updated>
     
+    <content type="html"><![CDATA[<p>new和malloc的10点区别。本文内容参考<a href="https://www.cnblogs.com/QG-whz/p/5140930.html%E3%80%82">https://www.cnblogs.com/QG-whz/p/5140930.html。</a></p><a id="more"></a><ol><li>new是C++的关键字，需要编译器提供支持（当然都支持）；malloc是库函数，需要include&lt;malloc.h&gt;的头文件；</li><li>new是C++的运算符，支持重载，而malloc不支持；</li><li>new分配内存是在自由存储区，自由存储区是个抽象概念，详情参考<a href="8f50d358.html">C++的存储结构</a>。而malloc分配内存是在堆区；</li><li>new分配内存失败会返回bad_alloc异常，而mallc失败返回NULL；</li><li>new返回类型安全，是指向对象的指针，而malloc返回类型不安全，是一个(void*)指针，需要用户进行强制类型转换；</li><li>new会调用对象的构造函数，在内存空间中构造每个数据成员，而malloc不会调用构造函数，只是返回一个指向原始内存空间的指针，因此，OOP中不适合使用malloc。同理，delete会调用析构函数，而free不会；</li><li>new不需要显示确定每个对象的大小，编译器会自行计算，而malloc需要使用sizeof运算符显示指出；</li><li>new内部可以通过调用malloc实现，但是反过来不行；</li><li>malloc存在直观的重新分配内存方式realloc，new不存在直观的方式；</li><li>new抛出异常之前先去执行用户指定的错误处理函数，具体可以由用户控制，malloc只能返回NULL，无其它能做的事情。</li></ol><p>关于C++ free函数是如何判断内存空间的大小？<br>现代C++编译器在使用malloc分配内存时，将内存大小存放在分配内存前面的地址空间内，对于每个编译器其值固定。这样free是通过当前指针便能找到占用内存大小，从而确定free内存。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;new和malloc的10点区别。本文内容参考&lt;a href=&quot;https://www.cnblogs.com/QG-whz/p/5140930.html%E3%80%82&quot;&gt;https://www.cnblogs.com/QG-whz/p/5140930.html。&lt;/a&gt;&lt;/p&gt;</summary>
     
     
     
