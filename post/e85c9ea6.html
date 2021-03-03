@@ -25,15 +25,15 @@
     }
   </style>
   
-  <meta name="description" content="auto和decltype称为占位符，在编译时进行自动类型推断。 auto使用的几点注意 auto从给定初值中进行类型推断，使用auto的表达式同时完成定义和初始化； auto支持一行语句定义多个变量，但需要类型相同。注意&amp;和*非基本数据类型； 123456789int a;auto b&#x3D;a, &amp;c&#x3D;a; &#x2F;&#x2F; 正确 auto类型推断为intauto d&#x3D;&amp;a; &#x2F;&#x2F;">
+  <meta name="description" content="auto和decltype称为占位符，在编译时进行自动类型推断。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="decltype和auto的比较">
 <meta property="og:url" content="http://xkwang.cn/post/e85c9ea6.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="auto和decltype称为占位符，在编译时进行自动类型推断。 auto使用的几点注意 auto从给定初值中进行类型推断，使用auto的表达式同时完成定义和初始化； auto支持一行语句定义多个变量，但需要类型相同。注意&amp;和*非基本数据类型； 123456789int a;auto b&#x3D;a, &amp;c&#x3D;a; &#x2F;&#x2F; 正确 auto类型推断为intauto d&#x3D;&amp;a; &#x2F;&#x2F;">
+<meta property="og:description" content="auto和decltype称为占位符，在编译时进行自动类型推断。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-02-20T13:21:37.000Z">
-<meta property="article:modified_time" content="2021-03-03T14:49:01.598Z">
+<meta property="article:modified_time" content="2021-03-03T14:49:51.979Z">
 <meta property="article:author" content="xkwang">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -207,9 +207,9 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <a id="more"></a>
+        <p>auto和decltype称为占位符，在编译时进行自动类型推断。</p>
+<a id="more"></a>
 
-<p>auto和decltype称为占位符，在编译时进行自动类型推断。</p>
 <h4 id="auto使用的几点注意"><a href="#auto使用的几点注意" class="headerlink" title="auto使用的几点注意"></a>auto使用的几点注意</h4><ol>
 <li>auto从给定初值中进行类型推断，使用auto的表达式同时完成定义和初始化；</li>
 <li>auto支持一行语句定义多个变量，但需要类型相同。注意&amp;和*非基本数据类型； <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a;</span><br><span class="line"><span class="keyword">auto</span> b=a, &amp;c=a; <span class="comment">// 正确 auto类型推断为int</span></span><br><span class="line"><span class="keyword">auto</span> d=&amp;a; <span class="comment">// 正确，auto推断类型为int*</span></span><br><span class="line"><span class="keyword">auto</span> *d1=&amp;a; <span class="comment">// 正确，auto推断类型也是int*，auto推断可以看出很灵活</span></span><br><span class="line"><span class="keyword">auto</span> b=a, &amp;c=a, d=&amp;a; <span class="comment">// 错误 前两个auto推断为int,后面为int*</span></span><br><span class="line"><span class="keyword">auto</span> b=a, &amp;c=a, *d=&amp;a;<span class="comment">// 正确 auto全部推断为int </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> m=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">auto</span> x=a, y=m, *z=&amp;m; <span class="comment">// x,y均int，但&amp;z是const int类型，error</span></span><br></pre></td></tr></table></figure></li>
