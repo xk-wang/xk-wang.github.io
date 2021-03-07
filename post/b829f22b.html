@@ -6,7 +6,7 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://xkwang.cn">
-  <title>C++中main函数参数 | XK</title>
+  <title>C++中的模板编程 | XK</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
@@ -25,17 +25,17 @@
     }
   </style>
   
-  <meta name="description" content="C++ main函数带参数声明为int main(int argc, char* argv[])。第一个参数代表参数个数，第二个参数代表参数字符串数组。">
+  <meta name="description" content="1.模板函数 写法typename or class 需要在每个模板函数前面使用template关键字进行生成 实际使用模板函数时可以让编译器进行自动类型推导，也可以进行显示指定。 普通函数可以进行自动类型转换，函数模板必须精确的进行类型匹配 函数模板也可以向普通函数一样被重载 重载时优先匹配普通函数，如果一定要调用模板函数，则需要进行显示类型指定。 c++编译的过程 与编译器，编译器，汇">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++中main函数参数">
-<meta property="og:url" content="http://xkwang.cn/post/50d4ff1a.html">
+<meta property="og:title" content="C++中的模板编程">
+<meta property="og:url" content="http://xkwang.cn/post/b829f22b.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="C++ main函数带参数声明为int main(int argc, char* argv[])。第一个参数代表参数个数，第二个参数代表参数字符串数组。">
+<meta property="og:description" content="1.模板函数 写法typename or class 需要在每个模板函数前面使用template关键字进行生成 实际使用模板函数时可以让编译器进行自动类型推导，也可以进行显示指定。 普通函数可以进行自动类型转换，函数模板必须精确的进行类型匹配 函数模板也可以向普通函数一样被重载 重载时优先匹配普通函数，如果一定要调用模板函数，则需要进行显示类型指定。 c++编译的过程 与编译器，编译器，汇">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-02-20T08:40:09.000Z">
-<meta property="article:modified_time" content="2021-02-23T05:48:09.264Z">
+<meta property="article:published_time" content="2021-03-07T04:00:41.000Z">
+<meta property="article:modified_time" content="2021-03-07T04:01:42.834Z">
 <meta property="article:author" content="xkwang">
-<meta property="article:tag" content="C++">
+<meta property="article:tag" content="STL">
 <meta name="twitter:card" content="summary">
   
   
@@ -181,20 +181,20 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-C-中main函数参数" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-C-中的模板编程" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      C++中main函数参数
+      C++中的模板编程
     </h1>
   
 
         
-        <a href="/post/50d4ff1a.html" class="archive-article-date">
-  	<time datetime="2021-02-20T08:40:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
+        <a href="/post/b829f22b.html" class="archive-article-date">
+  	<time datetime="2021-03-07T04:00:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-07</time>
 </a>
 
 
@@ -207,10 +207,37 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>C++ main函数带参数声明为<code>int main(int argc, char* argv[])</code>。第一个参数代表参数个数，第二个参数代表参数字符串数组。</p>
-<a id="more"></a>
+        <a id="more"></a>
 
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//compile, g++ test.cpp -o test</span></span><br><span class="line"><span class="comment">//running, ./test 1 2.0</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span>&#123;</span><br><span class="line">    <span class="comment">// sizeof(argv) will return the pointer size instead of array size like array!</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="keyword">sizeof</span>(argv)/<span class="keyword">sizeof</span>(argv[<span class="number">0</span>])&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 1</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;argc&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 3</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// print the origin strings</span></span><br><span class="line">    <span class="comment">// &quot;C:\Users\25411\Desktop\test\test.exe&quot; &quot;1&quot; &quot;2.0&quot;</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;argc; ++i)&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;argv[i]&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// convert strings to proper type atoi, ascii to int  </span></span><br><span class="line">    <span class="comment">// atof, ascii to float</span></span><br><span class="line">    <span class="comment">// atol, atoll</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;argv[<span class="number">0</span>]&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// &quot;C:\Users\25411\Desktop\test\test.exe&quot;</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;atoi(argv[<span class="number">1</span>])&lt;&lt;<span class="string">&quot; &quot;</span>&lt;&lt;atof(argv[<span class="number">2</span>])&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>; <span class="comment">// 1 2</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>1.模板函数</p>
+<p>写法typename or class</p>
+<p>需要在每个模板函数前面使用template关键字进行生成</p>
+<p>实际使用模板函数时可以让编译器进行自动类型推导，也可以进行显示指定。</p>
+<p>普通函数可以进行自动类型转换，函数模板必须精确的进行类型匹配</p>
+<p>函数模板也可以向普通函数一样被重载</p>
+<p>重载时优先匹配普通函数，如果一定要调用模板函数，则需要进行显示类型指定。</p>
+<p>c++编译的过程</p>
+<p>与编译器，编译器，汇编器，链接器  ESc 最后链接器不需要添加参数</p>
+<p>函数模板在编译期间会生成具体的模板函数，这意味着函数模板只是让编译器帮我们去生成函数，实际需要的函数数量和手动写没区别。</p>
+<p>函数模板需要进行两次编译，第一次编译把函数模板编译，第二次是根据实际函数调用进行编译。</p>
+<p>函数模板可以自动类型转换，类模板必须显示指明类型</p>
+<p>类模板派生普通类必须要指定模板类型，因为编译器需要知道占据内存大小</p>
+<p>类模板派生模板类直接继续使用泛型参数T</p>
+<p>一定要了解工具的熟悉使用，这点还是听众还要的，看着别人的有些地方很快其实就是熟练使用工具，比如vs中字母大写是选中ctrl+shift+u，我需要确定自己需要使用的ide并且后续一直坚持下去。</p>
+<p>C++中头文件可以直接写#pragma once来代替</p>
+<p>#if ndefine xxx</p>
+<p>#define xxx</p>
+<p>#endif</p>
+<p>防止头文件重复包含</p>
+<p>分离式编译，h进行类声明，cpp文件进行实现</p>
+<p>类模板在类内实现</p>
+<p>友元模板函数linux和windows还不太一样</p>
+<p>类模板在类外实现</p>
+<p>类模板h和cpp分开编写出错的原因。结合分离式编译和模板的两次编译过程分析。</p>
+<p>解决方案是把模板的h写成cpp或者写在一起hpp（类模板）</p>
+
       
 
       
@@ -254,7 +281,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">STL</a>
         		</li>
       		
 		</ul>
@@ -310,7 +337,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/50d4ff1a.html" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/b829f22b.html" alt="微信分享二维码">
     </div>
 </div>
 
@@ -324,18 +351,18 @@
   
 <nav id="article-nav">
   
-    <a href="/post/8f50d358.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/post/ec323bcb.html" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          C++类和对象的存储结构
+          linux中的rename
         
       </div>
     </a>
   
   
-    <a href="/post/b61a0d65.html" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">C++访问权限控制关键字</div>
+    <a href="/post/1705cf83.html" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">C++类的基本成员函数</div>
       <i class="icon-circle-right"></i>
     </a>
   

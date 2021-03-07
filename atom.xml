@@ -6,7 +6,7 @@
   <link href="http://xkwang.cn/atom.xml" rel="self"/>
   
   <link href="http://xkwang.cn/"/>
-  <updated>2021-03-07T03:57:02.420Z</updated>
+  <updated>2021-03-07T04:37:51.421Z</updated>
   <id>http://xkwang.cn/</id>
   
   <author>
@@ -17,11 +17,107 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>vmware中的网络连接方式</title>
+    <link href="http://xkwang.cn/post/89432efe.html"/>
+    <id>http://xkwang.cn/post/89432efe.html</id>
+    <published>2021-03-07T04:37:51.000Z</published>
+    <updated>2021-03-07T04:37:51.421Z</updated>
+    
+    <content type="html"><![CDATA[<a id="more"></a>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;</summary>
+      
+    
+    
+    
+    
+    <category term="default" scheme="http://xkwang.cn/tags/default/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux中scp使用</title>
+    <link href="http://xkwang.cn/post/221fa5a3.html"/>
+    <id>http://xkwang.cn/post/221fa5a3.html</id>
+    <published>2021-03-07T04:37:38.000Z</published>
+    <updated>2021-03-07T04:37:38.779Z</updated>
+    
+    <content type="html"><![CDATA[<a id="more"></a>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;</summary>
+      
+    
+    
+    
+    
+    <category term="default" scheme="http://xkwang.cn/tags/default/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux中的rename</title>
+    <link href="http://xkwang.cn/post/ec323bcb.html"/>
+    <id>http://xkwang.cn/post/ec323bcb.html</id>
+    <published>2021-03-07T04:36:54.000Z</published>
+    <updated>2021-03-07T04:36:54.943Z</updated>
+    
+    <content type="html"><![CDATA[<a id="more"></a>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;</summary>
+      
+    
+    
+    
+    
+    <category term="default" scheme="http://xkwang.cn/tags/default/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C++中的模板编程</title>
+    <link href="http://xkwang.cn/post/b829f22b.html"/>
+    <id>http://xkwang.cn/post/b829f22b.html</id>
+    <published>2021-03-07T04:00:41.000Z</published>
+    <updated>2021-03-07T04:01:42.834Z</updated>
+    
+    <content type="html"><![CDATA[<a id="more"></a><p>1.模板函数</p><p>写法typename or class</p><p>需要在每个模板函数前面使用template关键字进行生成</p><p>实际使用模板函数时可以让编译器进行自动类型推导，也可以进行显示指定。</p><p>普通函数可以进行自动类型转换，函数模板必须精确的进行类型匹配</p><p>函数模板也可以向普通函数一样被重载</p><p>重载时优先匹配普通函数，如果一定要调用模板函数，则需要进行显示类型指定。</p><p>c++编译的过程</p><p>与编译器，编译器，汇编器，链接器  ESc 最后链接器不需要添加参数</p><p>函数模板在编译期间会生成具体的模板函数，这意味着函数模板只是让编译器帮我们去生成函数，实际需要的函数数量和手动写没区别。</p><p>函数模板需要进行两次编译，第一次编译把函数模板编译，第二次是根据实际函数调用进行编译。</p><p>函数模板可以自动类型转换，类模板必须显示指明类型</p><p>类模板派生普通类必须要指定模板类型，因为编译器需要知道占据内存大小</p><p>类模板派生模板类直接继续使用泛型参数T</p><p>一定要了解工具的熟悉使用，这点还是听众还要的，看着别人的有些地方很快其实就是熟练使用工具，比如vs中字母大写是选中ctrl+shift+u，我需要确定自己需要使用的ide并且后续一直坚持下去。</p><p>C++中头文件可以直接写#pragma once来代替</p><p>#if ndefine xxx</p><p>#define xxx</p><p>#endif</p><p>防止头文件重复包含</p><p>分离式编译，h进行类声明，cpp文件进行实现</p><p>类模板在类内实现</p><p>友元模板函数linux和windows还不太一样</p><p>类模板在类外实现</p><p>类模板h和cpp分开编写出错的原因。结合分离式编译和模板的两次编译过程分析。</p><p>解决方案是把模板的h写成cpp或者写在一起hpp（类模板）</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
+
+
+
+&lt;p&gt;1.模板函数&lt;/p&gt;
+&lt;p&gt;写法typename or class&lt;/p&gt;
+&lt;p&gt;需要在每个模板函数前面使用template关键字进行生成&lt;/p&gt;
+&lt;p&gt;实际使用模板函数时可以让编译器进行自动类型推导，也可以进行显示指定。&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    
+    <category term="STL" scheme="http://xkwang.cn/tags/STL/"/>
+    
+  </entry>
+  
+  <entry>
     <title>C++类的基本成员函数</title>
     <link href="http://xkwang.cn/post/1705cf83.html"/>
     <id>http://xkwang.cn/post/1705cf83.html</id>
     <published>2021-03-07T03:56:29.000Z</published>
-    <updated>2021-03-07T03:57:02.420Z</updated>
+    <updated>2021-03-07T03:57:09.768Z</updated>
     
     <content type="html"><![CDATA[<p>等待完善</p><a id="more"></a><p>cpp有哪些类方法如果没有定义编译器会自动生成呢？如果没有定义,构造函数，析构函数，拷贝构造函数，赋值运算符重载都会由编译器自动构造，而移动复制构造不会。</p>]]></content>
     
