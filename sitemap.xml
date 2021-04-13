@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://xkwang.cn/post/1dfa3723.html</loc>
+    
+    <lastmod>2021-04-13</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://xkwang.cn/post/ade28559.html</loc>
+    
+    <lastmod>2021-04-13</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://xkwang.cn/post/d48ef435.html</loc>
     
     <lastmod>2021-04-06</lastmod>
@@ -214,7 +228,7 @@
 
   <url>
     <loc>http://xkwang.cn/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -222,42 +236,42 @@
   
   <url>
     <loc>http://xkwang.cn/tags/C/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://xkwang.cn/tags/hexo/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://xkwang.cn/tags/STL/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://xkwang.cn/tags/default/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://xkwang.cn/tags/Linux/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://xkwang.cn/tags/%E8%AE%A1%E7%BD%91/</loc>
-    <lastmod>2021-04-06</lastmod>
+    <lastmod>2021-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
