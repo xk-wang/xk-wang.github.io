@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://xkwang.cn/photos/ins.json</loc>
+    
+    <lastmod>2021-04-13</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://xkwang.cn/post/1dfa3723.html</loc>
     
     <lastmod>2021-04-13</lastmod>
@@ -80,13 +87,6 @@
   
   <url>
     <loc>http://xkwang.cn/post/1705cf83.html</loc>
-    
-    <lastmod>2021-03-07</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://xkwang.cn/photos/ins.json</loc>
     
     <lastmod>2021-03-07</lastmod>
     
