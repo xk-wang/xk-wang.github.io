@@ -6,7 +6,7 @@
   <link href="http://xkwang.cn/atom.xml" rel="self"/>
   
   <link href="http://xkwang.cn/"/>
-  <updated>2021-04-13T10:50:49.386Z</updated>
+  <updated>2021-04-20T05:59:09.298Z</updated>
   <id>http://xkwang.cn/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>牛顿迭代法</title>
+    <link href="http://xkwang.cn/post/fb62aca2.html"/>
+    <id>http://xkwang.cn/post/fb62aca2.html</id>
+    <published>2021-04-20T05:57:31.000Z</published>
+    <updated>2021-04-20T05:59:09.298Z</updated>
+    
+    <content type="html"><![CDATA[<p>牛顿迭代法用于近似求解多项式的零点十分方便，收敛速度也很快，比二分法还快。</p><a id="more"></a><h3 id="牛顿迭代法"><a href="#牛顿迭代法" class="headerlink" title="牛顿迭代法"></a>牛顿迭代法</h3><p>牛顿迭代法常用来求解方程的近似根，因为多数的方程没有求根公式，这也是大多数计算机内部的求解根的方法，收敛速度非常快。</p><h4 id="牛顿迭代法的思路"><a href="#牛顿迭代法的思路" class="headerlink" title="牛顿迭代法的思路"></a>牛顿迭代法的思路</h4><p>对于一般的曲线y=f(x)，通常没有求根公式，无法得到解析解，利用牛顿迭代法需要先对根的位置进行近似估计为x0，然后在x0的领域内将y=f(x)按照泰勒级数展开，并保留前几项，近似为多项式函数y=f1(x)。假设第一步的近似解是x1，那么过曲线f1(x)上点(x1, f1(x1))的切线为y=f1(x1)+f1’(x1)(x-x1)，那么该切线与x轴交点是x=x1-f1(x1)/f1’(x1)，记作x1=x1-f1(x1)/f1’(x1)，同理进行类推，得到了递推公式x(n+1)=x(n)-f1(x(n))/f1’(x(n))，不断迭代下去便能不断逼近真正的零点。</p><p>由于进行泰勒展开需要先预先估计零点，有误差，并且泰勒展开本身也有误差，并且最后的根也是近似的，因此实际中感觉还是多项式函数的根比较好用牛顿迭代法，对于多项式函数就不需要进行泰勒展开了。</p><p>例题：给定一个非负整数，求它的开方，向下取整。</p><p>构造函数y=x^2-a，那么迭代公式x(n+1)=[x(n)+a/x(n)]/2，直接把a当作初值迭代即可。</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">mySqrt</span><span class="params">(in a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> x=a;</span><br><span class="line">    <span class="comment">// 需要确保x*x不越界，因此需要把x定义为long int</span></span><br><span class="line">    <span class="keyword">while</span>(x*x&gt;a)&#123;</span><br><span class="line">        x=(x+a/x)/<span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;牛顿迭代法用于近似求解多项式的零点十分方便，收敛速度也很快，比二分法还快。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="算法" scheme="http://xkwang.cn/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
   
   <entry>
     <title>C++模板编程</title>
