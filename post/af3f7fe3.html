@@ -6,7 +6,7 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://xkwang.cn">
-  <title>Archives: 2021/2 | XK</title>
+  <title>C++内存管理初步 | XK</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
@@ -25,15 +25,17 @@
     }
   </style>
   
-  <meta name="description" content="华中科技大学20级，一名C++开发者，学习中...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="XK">
-<meta property="og:url" content="http://xkwang.cn/archives/2021/02/index.html">
+  <meta name="description" content="cpp提供了不同层次的内存管理工具，如malloc、new和allocator，所有的管理工具最终都是调用malloc，同时malloc最底层是调用系统的内存管理工具API。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++内存管理初步">
+<meta property="og:url" content="http://xkwang.cn/post/af3f7fe3.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="华中科技大学20级，一名C++开发者，学习中...">
+<meta property="og:description" content="cpp提供了不同层次的内存管理工具，如malloc、new和allocator，所有的管理工具最终都是调用malloc，同时malloc最底层是调用系统的内存管理工具API。">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-04-22T00:46:02.000Z">
+<meta property="article:modified_time" content="2021-04-22T01:01:53.326Z">
 <meta property="article:author" content="xkwang">
-<meta property="article:tag" content="后台,C++">
+<meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
   
   
@@ -179,38 +181,97 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-C-内存管理初步" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++内存管理初步
+    </h1>
+  
+
+        
+        <a href="/post/af3f7fe3.html" class="archive-article-date">
+  	<time datetime="2021-04-22T00:46:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-22</time>
+</a>
+
+
+        <!-- 需要添加的位置 -->
+        <!-- 开始添加字数统计-->
+        
+          <!-- 添加完成 -->
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>cpp提供了不同层次的内存管理工具，如malloc、new和allocator，所有的管理工具最终都是调用malloc，同时malloc最底层是调用系统的内存管理工具API。</p>
+<a id="more"></a>
+
+<p>关键点：cpp中提供给程序员的内存管理工具有malloc、new和allocator。</p>
+<blockquote>
+<p>allocator是给容器使用，只定义了实现接口的标准，具体实现方式没有要求，现在很多编译器allocator的实现仅仅是对new和delete做了一层简单的封装，效率低，之前版本的gnuc中使用了内存池+malloc的方式实现了高效的内存管理。</p>
+<p>new实现内存管理调用了operator new进行内存分配+placement new实现对象构造。operator new可以由用户进行重载，由此实现内存管理的接管，cpp中全局的operator new底层是malloc实现。</p>
+</blockquote>
+<p>内存管理的两个关键点：1.了解内存管理是如何调用到底层的malloc的；2.实现operator new的重载和allocator的自定义来实现内存管理接管。</p>
+<h4 id="概念了解"><a href="#概念了解" class="headerlink" title="概念了解"></a>概念了解</h4><p>cpp内存管理malloc、new、operator new、allocator。</p>
+<p>malloc不可被重载，new是cpp的关键字，由cpp标准确定下来了也不能重载，operator new可以被重载，也是接管内存管理的方式，allocator可以自定义然后将自定义版本传递给容器，也能实现内存管理的接管。</p>
+<p>一般不直接使用allocator来进行内存分配，因为使用起来比较麻烦，并且需要程序员自己记住分配的内存大小。</p>
+<h4 id="malloc、new、allocator分配内存实例"><a href="#malloc、new、allocator分配内存实例" class="headerlink" title="malloc、new、allocator分配内存实例"></a>malloc、new、allocator分配内存实例</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span>* p1 =<span class="built_in">malloc</span>(<span class="number">512</span>);</span><br><span class="line"><span class="built_in">free</span>(p1);</span><br><span class="line"></span><br><span class="line"><span class="built_in">complex</span>&lt;<span class="keyword">int</span>&gt;* p2= <span class="keyword">new</span> <span class="built_in">complex</span>&lt;<span class="keyword">int</span>&gt;;</span><br><span class="line"><span class="keyword">delete</span> p2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span>* p3 = ::<span class="keyword">operator</span> <span class="keyword">new</span>(<span class="number">512</span>);</span><br><span class="line">::<span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(p3)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用cpp提供的标准库中的allocator进行内存管理</span></span><br><span class="line"><span class="comment">// 标准库定义了接口，但是不同的厂商并未完全遵守。</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _MSC_VER</span></span><br><span class="line">  <span class="keyword">int</span>* p4 = allocator&lt;<span class="keyword">int</span>&gt;().allocate(<span class="number">3</span>, (<span class="keyword">int</span>*)<span class="number">0</span>);</span><br><span class="line">  allocator&lt;<span class="keyword">int</span>&gt;().deallocate(p4, <span class="number">3</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _BORLANDC_</span></span><br><span class="line">  <span class="keyword">int</span>* p4 = allocator&lt;<span class="keyword">int</span>&gt;().allocate(<span class="number">5</span>);</span><br><span class="line">  allocator&lt;<span class="keyword">int</span>&gt;().deallocate(p4, <span class="number">5</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _GNUC_</span></span><br><span class="line">  <span class="comment">// 这两个函数都是static，可通过全名调用之</span></span><br><span class="line">  <span class="keyword">void</span>* p4 = alloc::allocate(<span class="number">512</span>);</span><br><span class="line">  alloc::deallocate(p4, <span class="number">512</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 以下两函数都是non-static，需要通过object调用</span></span><br><span class="line">  <span class="keyword">void</span>* p4 = allocator&lt;<span class="keyword">int</span>&gt;().allocate(<span class="number">7</span>);</span><br><span class="line">  allocator&lt;<span class="keyword">int</span>&gt;.deallocate((<span class="keyword">int</span>*)p4, <span class="number">7</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 采用内存池实现</span></span><br><span class="line">  <span class="keyword">void</span>* p5 = __gnu_cxx::__pool_alloc&lt;<span class="keyword">int</span>&gt;().allocate(<span class="number">9</span>);</span><br><span class="line">  __gnu_cxx::__pool_alloc&lt;<span class="keyword">int</span>&gt;().deallocate((<span class="keyword">int</span>*)p5, <span class="number">9</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<h4 id="new-expression的底层实现"><a href="#new-expression的底层实现" class="headerlink" title="new expression的底层实现"></a>new expression的底层实现</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Complex* pc = <span class="keyword">new</span> Complex(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"><span class="comment">// 底层实现如下方代码</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span>* mem = <span class="keyword">operator</span> <span class="keyword">new</span>(<span class="keyword">sizeof</span>(Complex)); <span class="comment">// 调用operator new分配内存，operator new的底层是的调用malloc</span></span><br><span class="line"><span class="comment">//如果重载了operator new便自己接管了内存管理任务</span></span><br><span class="line">Complex* pc = <span class="keyword">static_cast</span>&lt;Complex*&gt;(mem); <span class="comment">// 进行类型转换</span></span><br><span class="line"><span class="keyword">new</span>(pc)Complex(<span class="number">1</span>,<span class="number">2</span>); <span class="comment">// 使用placement new执行构造函数，不能使用指针直接调用构造函数（个人理解如果直接能够用的话，与构造函数的语义相违背）</span></span><br></pre></td></tr></table></figure>
+<p>operator new可以被重载，便能实现内存管理的接管，至于operator new的底层如何实现，标准库没有要求，但是目前普遍使用malloc来实现内存管理。同时operator new考虑分配失败时调用用户定义的handler函数，确保malloc能分配到内存或者实现分配不到内存返回0让malloc退出。仅仅只是对malloc做了一点简单的封装。</p>
+<p>对于上述的placement new实现，底层实现如下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span>(pc)Complex(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"><span class="comment">//内部实现如下，以下忽略了异常捕获</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 第一行</span></span><br><span class="line"><span class="keyword">void</span>* mem = <span class="keyword">operator</span> <span class="keyword">new</span>(<span class="keyword">sizeof</span>(Complex), buf); <span class="comment">// operator new的一种重载形式</span></span><br><span class="line"><span class="comment">// 第二行</span></span><br><span class="line">pc = <span class="keyword">static_cast</span>&lt;Complex*&gt;(mem);</span><br><span class="line"><span class="comment">// 第三行</span></span><br><span class="line">pc-&gt;Complex::Complex(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第一行是operator new的重载版本，内部实现如下：</span></span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span>, <span class="keyword">void</span>* loc)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> loc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是对配套使用的delete pc进行解析</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> pc;</span><br><span class="line"><span class="comment">// 底层实现如下代码</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pc-&gt;~Complex(); <span class="comment">// 可以直接调用构造函数，因为pc现在指向了Complex对象</span></span><br><span class="line"><span class="keyword">operator</span> <span class="keyword">delete</span> pc; <span class="comment">// 底层实现是直接free(pc);</span></span><br></pre></td></tr></table></figure>
+<p><strong>tips:</strong> 析构函数的意义主要是对程序员分配的堆空间（调用new或者malloc）进行回收，以及调用成员的析构函数来实现成员变量的堆空间的释放。换言之，如果对象自身没有分配堆空间，成员变量也没有分配堆空间，那么析构函数是没有用的。当然除了物理资源的管理，析构函数也常常用来实现其它资源管理，如互斥锁的释放，以及计数器的减小（如智能指针的实现）。</p>
+<p>vector分配器底层还是调用malloc，其数据保存还是放在堆区，同手动malloc分配方式。</p>
+<h4 id="allocator的底层实现"><a href="#allocator的底层实现" class="headerlink" title="allocator的底层实现"></a>allocator的底层实现</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">T* p = allocate();</span><br><span class="line">construct();</span><br><span class="line">...</span><br><span class="line">destroy();</span><br><span class="line">deallocate p;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上述是一般的接口形式，不同厂商的实现方式略有不同</span></span><br><span class="line"><span class="comment">// G4.9 new_allocator 或者现在的std::allocator</span></span><br><span class="line">allocate();</span><br><span class="line">deallocate();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者使用目前最新版里面的的内存池的allocator __pool_alloc</span></span><br><span class="line">allocate();</span><br><span class="line">deallocate();</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 上述代码底层调用</span></span><br><span class="line">::<span class="function"><span class="keyword">operator</span> <span class="title">new</span><span class="params">(<span class="keyword">size_t</span>)</span></span>;</span><br><span class="line">::<span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(<span class="keyword">void</span>*)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 而上述代码最终调用malloc和free</span></span><br><span class="line"><span class="built_in">malloc</span>(<span class="keyword">size_t</span>);</span><br><span class="line"><span class="built_in">free</span>(<span class="keyword">void</span>*);</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>可以发现，无论是new expression还是allocator.allocate()，底层都是调用::operator new，底层再去调用malloc，同理相反的delete和deallocate()底层都是调用::operator delete，底层再去调用free。因此如果实现了对operator new的重载，便接管了内存管理！而对于内存释放operator delete一般不去重载。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>感谢您的支持:)<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/self/alipay.png">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/self/wechatpay.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/c39717db.html" class="archive-article-date">
-  	<time datetime="2021-02-22T00:24:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-22</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/c39717db.html">C++中的static关键字</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -222,539 +283,136 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/af3f7fe3.html" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/a19b496f.html" class="archive-article-date">
-  	<time datetime="2021-02-21T12:44:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/post/97281ac2.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          C++ operator new重载
+        
+      </div>
+    </a>
+  
+  
+    <a href="/post/fb62aca2.html" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">牛顿迭代法</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
 
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/a19b496f.html">C++中char的地址</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/158a3f9d.html" class="archive-article-date">
-  	<time datetime="2021-02-21T12:34:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/158a3f9d.html">C++四种类型转换的区别</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/30f3ce8a.html" class="archive-article-date">
-  	<time datetime="2021-02-21T09:56:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/30f3ce8a.html">C++类内存字节对齐</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/7f1322f0.html" class="archive-article-date">
-  	<time datetime="2021-02-21T09:26:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/7f1322f0.html">C++空白基类最优化</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/fa71210a.html" class="archive-article-date">
-  	<time datetime="2021-02-21T08:02:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/fa71210a.html">C++中的虚函数</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/e85c9ea6.html" class="archive-article-date">
-  	<time datetime="2021-02-20T13:21:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/e85c9ea6.html">decltype和auto的比较</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/c69e57ea.html" class="archive-article-date">
-  	<time datetime="2021-02-20T11:47:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/c69e57ea.html">new和malloc的区别</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/5082990a.html" class="archive-article-date">
-  	<time datetime="2021-02-20T09:16:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/5082990a.html">C++中的this指针</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/8f50d358.html" class="archive-article-date">
-  	<time datetime="2021-02-20T09:01:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/8f50d358.html">C++类和对象的存储结构</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/50d4ff1a.html" class="archive-article-date">
-  	<time datetime="2021-02-20T08:40:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/50d4ff1a.html">C++中main函数参数</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/b61a0d65.html" class="archive-article-date">
-  	<time datetime="2021-02-20T05:37:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/b61a0d65.html">C++访问权限控制关键字</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/d91bc6a5.html" class="archive-article-date">
-  	<time datetime="2021-02-20T04:03:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/d91bc6a5.html">OOP的三大特性</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/782b19c0.html" class="archive-article-date">
-  	<time datetime="2021-02-20T03:57:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/782b19c0.html">hexo博客使用方法</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
+
+  
+
+  <!-- 《utteranc评论：基于github issue的评论系统 -->
+  
+    <section id="comments" class="comments">
+      <style>
+        .utterances{max-width: 85%;}
+      </style>
+        <script src="https://utteranc.es/client.js"
+                repo="xk-wang/comment"
+                issue-term="title"
+                theme="github-light"
+                crossorigin="anonymous"
+                async>
+        </script>
+  </section>
+  
+  <!-- utteranc评论》 -->
+
+
 
 
           </div>
@@ -780,8 +438,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

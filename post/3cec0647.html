@@ -6,7 +6,7 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://xkwang.cn">
-  <title>Archives: 2021/2 | XK</title>
+  <title>C++中array new的底层实现 | XK</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
@@ -25,16 +25,20 @@
     }
   </style>
   
-  <meta name="description" content="华中科技大学20级，一名C++开发者，学习中...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="XK">
-<meta property="og:url" content="http://xkwang.cn/archives/2021/02/index.html">
+  <meta name="description" content="cpp array new的底层实现相比较于new只是多了几次构造函数的调用，同时array delete相比较于delete只是多了几次析构函数的调用，对于内存的分配和释放，array版本和非array版本都只进行了一次。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中array new的底层实现">
+<meta property="og:url" content="http://xkwang.cn/post/3cec0647.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="华中科技大学20级，一名C++开发者，学习中...">
+<meta property="og:description" content="cpp array new的底层实现相比较于new只是多了几次构造函数的调用，同时array delete相比较于delete只是多了几次析构函数的调用，对于内存的分配和释放，array版本和非array版本都只进行了一次。">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://xkwang.cn/assets/blog/3cec0647/mem.png">
+<meta property="article:published_time" content="2021-04-22T00:53:25.000Z">
+<meta property="article:modified_time" content="2021-04-22T00:59:08.225Z">
 <meta property="article:author" content="xkwang">
-<meta property="article:tag" content="后台,C++">
+<meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://xkwang.cn/assets/blog/3cec0647/mem.png">
   
   
     <link rel="icon" href="/assets/self/favicon.png">
@@ -179,38 +183,84 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-C-中array-new的底层实现" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++中array new的底层实现
+    </h1>
+  
+
+        
+        <a href="/post/3cec0647.html" class="archive-article-date">
+  	<time datetime="2021-04-22T00:53:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-22</time>
+</a>
+
+
+        <!-- 需要添加的位置 -->
+        <!-- 开始添加字数统计-->
+        
+          <!-- 添加完成 -->
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>cpp array new的底层实现相比较于new只是多了几次构造函数的调用，同时array delete相比较于delete只是多了几次析构函数的调用，对于内存的分配和释放，array版本和非array版本都只进行了一次。</p>
+<a id="more"></a>
+
+<h4 id="array-new的底层实现"><a href="#array-new的底层实现" class="headerlink" title="array new的底层实现"></a>array new的底层实现</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Complex* pc = <span class="keyword">new</span> Complex[<span class="number">3</span>];</span><br><span class="line"><span class="keyword">delete</span> [] pc;</span><br><span class="line"><span class="comment">// 上述代码的底层实现如下</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span>* mem = <span class="keyword">operator</span> <span class="keyword">new</span>(<span class="keyword">sizeof</span>(Complex)*<span class="number">3</span>);</span><br><span class="line">Complex* pc = <span class="keyword">static_cast</span>&lt;Complex*&gt;(mem);</span><br><span class="line">Complex* temp = pc;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;++i)&#123;</span><br><span class="line">    <span class="keyword">new</span>(temp++)Complex(); <span class="comment">// 调用默认的构造函数3次</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">temp = pc;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">2</span>;i&gt;=<span class="number">0</span>;--i)&#123;</span><br><span class="line">    temp = pc+i;</span><br><span class="line">    temp-&gt;~Complex(); <span class="comment">// 相反的顺序调用三次析构函数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(pc);</span><br><span class="line"><span class="comment">// “3”的数值是保存在malloc构造时的cookie中</span></span><br></pre></td></tr></table></figure>
+<p>new array的底层实现仅仅是多调用了几次构造和析构函数。</p>
+<p>编程时要求array new和array delete必须配套使用，否则可能产生内存泄漏。也就是上述代码中必须要使用delete [] pc，不能漏掉[]。</p>
+<p>不过上述代码即使漏掉了[]也不存在内存泄露问题，漏掉了就会只调用一次析构函数，但是Complex对象中不存在指针对象，没有指向其它的空间，仅仅只是实部和虚部的整形变量，因此，其析构函数是无意义的。</p>
+<p>下面的代码如果没有使用array delete会造成内存泄漏，因为对于string对象其成员是指针，实际的字符串存放在另外的空间，因此，string的析构函数是有意义的，漏掉了[]会导致两个string的内存空间无法释放，造成内尺寸泄漏。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">string</span>* ps = <span class="keyword">new</span> <span class="built_in">string</span>[<span class="number">3</span>];</span><br><span class="line"><span class="keyword">delete</span> ps; <span class="comment">// 内存泄漏</span></span><br></pre></td></tr></table></figure>
+<p>上述两种情形的内存布局如下图：</p>
+<div style="text-align: center">
+<img src="/assets/blog/3cec0647/mem.png" margin="0 auto" width="100%" height="50%"/>
+</div>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>感谢您的支持:)<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/self/alipay.png">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/self/wechatpay.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/c39717db.html" class="archive-article-date">
-  	<time datetime="2021-02-22T00:24:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-22</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/c39717db.html">C++中的static关键字</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -222,539 +272,127 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/3cec0647.html" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/a19b496f.html" class="archive-article-date">
-  	<time datetime="2021-02-21T12:44:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/post/97281ac2.html" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">C++ operator new重载</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
 
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/a19b496f.html">C++中char的地址</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/158a3f9d.html" class="archive-article-date">
-  	<time datetime="2021-02-21T12:34:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/158a3f9d.html">C++四种类型转换的区别</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/30f3ce8a.html" class="archive-article-date">
-  	<time datetime="2021-02-21T09:56:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/30f3ce8a.html">C++类内存字节对齐</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/7f1322f0.html" class="archive-article-date">
-  	<time datetime="2021-02-21T09:26:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/7f1322f0.html">C++空白基类最优化</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/fa71210a.html" class="archive-article-date">
-  	<time datetime="2021-02-21T08:02:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/fa71210a.html">C++中的虚函数</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/e85c9ea6.html" class="archive-article-date">
-  	<time datetime="2021-02-20T13:21:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/e85c9ea6.html">decltype和auto的比较</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/c69e57ea.html" class="archive-article-date">
-  	<time datetime="2021-02-20T11:47:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/c69e57ea.html">new和malloc的区别</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/5082990a.html" class="archive-article-date">
-  	<time datetime="2021-02-20T09:16:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/5082990a.html">C++中的this指针</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/8f50d358.html" class="archive-article-date">
-  	<time datetime="2021-02-20T09:01:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/8f50d358.html">C++类和对象的存储结构</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/50d4ff1a.html" class="archive-article-date">
-  	<time datetime="2021-02-20T08:40:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/50d4ff1a.html">C++中main函数参数</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/b61a0d65.html" class="archive-article-date">
-  	<time datetime="2021-02-20T05:37:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/b61a0d65.html">C++访问权限控制关键字</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/d91bc6a5.html" class="archive-article-date">
-  	<time datetime="2021-02-20T04:03:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/d91bc6a5.html">OOP的三大特性</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/post/782b19c0.html" class="archive-article-date">
-  	<time datetime="2021-02-20T03:57:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-20</time>
-</a>
-
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/post/782b19c0.html">hexo博客使用方法</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
+
+  
+
+  <!-- 《utteranc评论：基于github issue的评论系统 -->
+  
+    <section id="comments" class="comments">
+      <style>
+        .utterances{max-width: 85%;}
+      </style>
+        <script src="https://utteranc.es/client.js"
+                repo="xk-wang/comment"
+                issue-term="title"
+                theme="github-light"
+                crossorigin="anonymous"
+                async>
+        </script>
+  </section>
+  
+  <!-- utteranc评论》 -->
+
+
 
 
           </div>
@@ -780,8 +418,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
