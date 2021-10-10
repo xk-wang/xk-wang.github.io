@@ -6,7 +6,7 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://xkwang.cn">
-  <title>C++运算符重载 | XK</title>
+  <title>两种网络设计模式 | XK</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
@@ -25,18 +25,23 @@
     }
   </style>
   
-  <meta name="description" content="C++运算符重载，主要需要注意流运算符一般是通过友元函数来实现重载，这是因为如果通过成员函数重载，那么对象是在&lt;&lt;或&gt;&gt;的左边，不仅很奇怪，而且无法实现连续调用形式。">
+  <meta name="description" content="介绍reactor和模拟proactor两种高性能网络模式。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++运算符重载">
-<meta property="og:url" content="http://xkwang.cn/post/1dfa3723.html">
+<meta property="og:title" content="两种网络设计模式">
+<meta property="og:url" content="http://xkwang.cn/post/d7864812.html">
 <meta property="og:site_name" content="XK">
-<meta property="og:description" content="C++运算符重载，主要需要注意流运算符一般是通过友元函数来实现重载，这是因为如果通过成员函数重载，那么对象是在&lt;&lt;或&gt;&gt;的左边，不仅很奇怪，而且无法实现连续调用形式。">
+<meta property="og:description" content="介绍reactor和模拟proactor两种高性能网络模式。">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-04-13T10:43:23.000Z">
-<meta property="article:modified_time" content="2021-04-13T10:51:47.778Z">
+<meta property="og:image" content="c:/Users/HUAWEI/Desktop/webserver/docs/imgs/单reactor.png">
+<meta property="og:image" content="c:/Users/HUAWEI/Desktop/webserver/docs/imgs/单reactor多线程.png">
+<meta property="og:image" content="c:/Users/HUAWEI/Desktop/webserver/docs/imgs/多reactor多线程.png">
+<meta property="og:image" content="c:/Users/HUAWEI/Desktop/webserver/docs/imgs/proactor.png">
+<meta property="article:published_time" content="2021-10-10T08:09:30.000Z">
+<meta property="article:modified_time" content="2021-10-10T08:24:10.101Z">
 <meta property="article:author" content="xkwang">
-<meta property="article:tag" content="C++">
+<meta property="article:tag" content="default">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/HUAWEI/Desktop/webserver/docs/imgs/单reactor.png">
   
   
     <link rel="icon" href="/assets/self/favicon.png">
@@ -181,20 +186,20 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-C-运算符重载" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-两种网络设计模式" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      C++运算符重载
+      两种网络设计模式
     </h1>
   
 
         
-        <a href="/post/1dfa3723.html" class="archive-article-date">
-  	<time datetime="2021-04-13T10:43:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-13</time>
+        <a href="/post/d7864812.html" class="archive-article-date">
+  	<time datetime="2021-10-10T08:09:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-10</time>
 </a>
 
 
@@ -207,36 +212,36 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>C++运算符重载，主要需要注意流运算符一般是通过友元函数来实现重载，这是因为如果通过成员函数重载，那么对象是在&lt;&lt;或&gt;&gt;的左边，不仅很奇怪，而且无法实现连续调用形式。</p>
+        <p>介绍reactor和模拟proactor两种高性能网络模式。</p>
 <a id="more"></a>
 
-<h3 id="运算符重载"><a href="#运算符重载" class="headerlink" title="运算符重载"></a>运算符重载</h3><p>不能重载的运算符</p>
-<p><strong>.  .*   ::  ?:  sizeof</strong></p>
-<p>只能作为类成员函数重载</p>
-<p><strong>() [] -&gt; =</strong></p>
-<p>构造一个类</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Book();</span><br><span class="line">        ~Book();</span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">int</span> price;</span><br><span class="line">        <span class="keyword">int</span> num;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="下标的重载"><a href="#下标的重载" class="headerlink" title="下标的重载"></a>下标的重载</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Book() : price(<span class="number">0</span>), num(<span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(author, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">int</span>)*maxSize);</span><br><span class="line">    &#125;;</span><br><span class="line">    Book(<span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    Book&amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    ~Book() &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//只能使用成员函数实现</span></span><br><span class="line">    <span class="keyword">int</span> <span class="keyword">operator</span> [](<span class="keyword">size_t</span> i) <span class="keyword">const</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> price;</span><br><span class="line">    <span class="keyword">int</span> num;</span><br><span class="line">    <span class="keyword">int</span> author[<span class="number">5</span>];</span><br><span class="line">    <span class="keyword">int</span> maxSize = <span class="number">5</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> Book::<span class="keyword">operator</span>[](<span class="keyword">size_t</span> i) <span class="keyword">const</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(i&gt;=maxSize)</span><br><span class="line">        <span class="keyword">throw</span> <span class="string">&quot;Index out of range!&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> author[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="流运算符重载"><a href="#流运算符重载" class="headerlink" title="流运算符重载"></a>流运算符重载</h4><ol>
-<li>流运算符只能重载为普通函数，不能重载为成员函数，重载为成员函数需要&lt;&lt;或者&gt;&gt;左侧的对象是我们定义的对象，这样就造成了Object&lt;&lt;cin或者Object&gt;&gt;cout的使用，与常规调用方法不符合，因此一般只重载为普通函数。</li>
-<li>重载为一般函数时如果要访问private成员则需要定义为类的友元。</li>
-</ol>
-<p>上述的Book类进行流运算符重载</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Book() : price(<span class="number">0</span>), num(<span class="number">0</span>) &#123;&#125;;</span><br><span class="line">    ~Book() &#123;&#125;;</span><br><span class="line">    <span class="comment">// 友元函数声明时需要添加friend关键词</span></span><br><span class="line">    <span class="keyword">friend</span> ostream&amp; <span class="keyword">operator</span> &lt;&lt;(ostream&amp; os, <span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    <span class="keyword">friend</span> istream&amp; <span class="keyword">operator</span> &gt;&gt;(istream&amp; is, Book&amp; book);</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> price;</span><br><span class="line">    <span class="keyword">int</span> num;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 进行友元函数的定义时不需要添加friend，否则会报错</span></span><br><span class="line">ostream&amp; <span class="keyword">operator</span> &lt;&lt;(ostream&amp; os, <span class="keyword">const</span> Book&amp; book)&#123;</span><br><span class="line">    os&lt;&lt;<span class="string">&quot;Book price: &quot;</span>&lt;&lt;book.price&lt;&lt;<span class="string">&quot; num: &quot;</span>&lt;&lt;book.num&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> os;</span><br><span class="line">&#125;</span><br><span class="line">istream&amp; <span class="keyword">operator</span> &gt;&gt;(istream&amp; is, Book&amp; book)&#123;</span><br><span class="line">    is&gt;&gt;book.price&gt;&gt;book.num;</span><br><span class="line">    <span class="keyword">return</span> is;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="单目运算符重载"><a href="#单目运算符重载" class="headerlink" title="单目运算符重载"></a>单目运算符重载</h4><p>自增运算符/自减运算符 分别重载为类成员函数 和 普通函数</p>
-<p>两种形式都能定义，但是类成员和普通成员函数只能定义一种，否则调用时含义不明</p>
-<p>同时能发现对于后置运算符，需要定义拷贝构造函数和拷贝赋值运算符</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Book() : price(<span class="number">0</span>), num(<span class="number">0</span>) &#123;&#125;;</span><br><span class="line">    Book(<span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    Book&amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    ~Book() &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    Book&amp; operator ++ (); // 前置 允许++++a</span></span><br><span class="line"><span class="comment">//    const Book operator ++ (int n); // 后置 不允许a++++</span></span><br><span class="line"><span class="comment">//    Book&amp; operator --(); // 前置 允许----a</span></span><br><span class="line"><span class="comment">//    const Book operator --(int n); // 后置 不允许a----</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> Book&amp; <span class="keyword">operator</span> ++(Book&amp; book);</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> Book <span class="keyword">operator</span> ++(Book&amp; book, <span class="keyword">int</span> n);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> Book&amp; <span class="keyword">operator</span> --(Book&amp; book);</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> Book <span class="keyword">operator</span> --(Book&amp; book, <span class="keyword">int</span> n);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> ostream&amp; <span class="keyword">operator</span> &lt;&lt;(ostream&amp; os, <span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    <span class="keyword">friend</span> istream&amp; <span class="keyword">operator</span> &gt;&gt;(istream&amp; is, Book&amp; book);</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> price;</span><br><span class="line">    <span class="keyword">int</span> num;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拷贝运算的定义</span></span><br><span class="line">Book::Book(<span class="keyword">const</span> Book&amp; book)&#123;</span><br><span class="line">    price = book.price;</span><br><span class="line">    num = book.num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Book&amp; Book::<span class="keyword">operator</span> = (<span class="keyword">const</span> Book&amp; rhs)&#123;</span><br><span class="line">    <span class="comment">// 按道理不能运行</span></span><br><span class="line">    price = rhs.price;</span><br><span class="line">    num = rhs.num;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Book&amp; Book::operator ++()&#123;</span></span><br><span class="line"><span class="comment">//    ++price;</span></span><br><span class="line"><span class="comment">//    ++num;</span></span><br><span class="line"><span class="comment">//    return *this;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//// 从这里看出是需要定义拷贝复制运算符的</span></span><br><span class="line"><span class="comment">//const Book Book::operator ++(int n)&#123;</span></span><br><span class="line"><span class="comment">//    Book old = *this;</span></span><br><span class="line"><span class="comment">//    ++price;</span></span><br><span class="line"><span class="comment">//    ++num;</span></span><br><span class="line"><span class="comment">//    return old;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//Book&amp; Book::operator --()&#123;</span></span><br><span class="line"><span class="comment">//    --price;</span></span><br><span class="line"><span class="comment">//    --num;</span></span><br><span class="line"><span class="comment">//    return *this;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//const Book Book::operator--(int n)&#123;</span></span><br><span class="line"><span class="comment">//    Book old=*this;</span></span><br><span class="line"><span class="comment">//    --price;</span></span><br><span class="line"><span class="comment">//    --num;</span></span><br><span class="line"><span class="comment">//    return old;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 友元函数的实现 友元函数就没有域作用符号了，不是类成员</span></span><br><span class="line">Book&amp; <span class="keyword">operator</span> ++(Book&amp; book) &#123;</span><br><span class="line">    ++book.price;</span><br><span class="line">    ++book.num;</span><br><span class="line">    <span class="keyword">return</span> book;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> Book <span class="keyword">operator</span> ++(Book&amp; book, <span class="keyword">int</span> n) &#123;</span><br><span class="line">    Book old = book;</span><br><span class="line">    ++book.price;</span><br><span class="line">    ++book.num;</span><br><span class="line">    <span class="keyword">return</span> old;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Book&amp; <span class="keyword">operator</span> --(Book&amp; book) &#123;</span><br><span class="line">    --book.price;</span><br><span class="line">    --book.num;</span><br><span class="line">    <span class="keyword">return</span> book;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> Book <span class="keyword">operator</span> --(Book&amp; book, <span class="keyword">int</span> n) &#123;</span><br><span class="line">    Book old = book;</span><br><span class="line">    --book.price;</span><br><span class="line">    --book.num;</span><br><span class="line">    <span class="keyword">return</span> old;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 进行普通函数的自增、自减的重载 需要定义为友元</span></span><br><span class="line"></span><br><span class="line">ostream&amp; <span class="keyword">operator</span> &lt;&lt;(ostream&amp; os, <span class="keyword">const</span> Book&amp; book)&#123;</span><br><span class="line">    os&lt;&lt;<span class="string">&quot;Book price: &quot;</span>&lt;&lt;book.price&lt;&lt;<span class="string">&quot; num: &quot;</span>&lt;&lt;book.num;</span><br><span class="line">    <span class="keyword">return</span> os;</span><br><span class="line">&#125;</span><br><span class="line">istream&amp; <span class="keyword">operator</span> &gt;&gt;(istream&amp; is, Book&amp; book)&#123;</span><br><span class="line">    is&gt;&gt;book.price&gt;&gt;book.num;</span><br><span class="line">    <span class="keyword">return</span> is;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="双目运算符重载"><a href="#双目运算符重载" class="headerlink" title="双目运算符重载"></a>双目运算符重载</h4><p>同时实现成员函数和友元函数，会优先调用成员函数</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Book() : price(<span class="number">0</span>), num(<span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(author, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">int</span>)*maxSize);</span><br><span class="line">    &#125;;</span><br><span class="line">    Book(<span class="keyword">int</span> price, <span class="keyword">int</span> num): price(price), num(num) &#123;&#125;;</span><br><span class="line">    Book(<span class="keyword">const</span> Book&amp; book);</span><br><span class="line">    Book&amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> Book&amp; rhs);</span><br><span class="line">    <span class="comment">// 一般加号返回右值 会优先调用成员函数</span></span><br><span class="line">    <span class="keyword">const</span> Book <span class="keyword">operator</span> + (<span class="keyword">const</span> Book&amp; rhs);</span><br><span class="line">    <span class="comment">// 使用友元函数实现</span></span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">const</span> Book <span class="keyword">operator</span> + (<span class="keyword">const</span> Book&amp; lhs, <span class="keyword">const</span> Book&amp; rhs);</span><br><span class="line">    ~Book() &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> ostream&amp; <span class="keyword">operator</span> &lt;&lt; (ostream&amp; os ,<span class="keyword">const</span> Book&amp; rhs);</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> price;</span><br><span class="line">    <span class="keyword">int</span> num;</span><br><span class="line">    <span class="keyword">int</span> author[<span class="number">5</span>];</span><br><span class="line">    <span class="keyword">int</span> maxSize = <span class="number">5</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拷贝运算的定义</span></span><br><span class="line">Book::Book(<span class="keyword">const</span> Book&amp; book)&#123;</span><br><span class="line">    price = book.price;</span><br><span class="line">    num = book.num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Book&amp; Book::<span class="keyword">operator</span> = (<span class="keyword">const</span> Book&amp; rhs)&#123;</span><br><span class="line">    <span class="comment">// 按道理不能运行</span></span><br><span class="line">    price = rhs.price;</span><br><span class="line">    num = rhs.num;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> Book Book::<span class="keyword">operator</span>+(<span class="keyword">const</span> Book &amp;rhs) &#123;</span><br><span class="line">    <span class="function">Book <span class="title">book</span><span class="params">(price+rhs.price, num+rhs.num)</span></span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;member function &quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> book;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> Book <span class="keyword">operator</span> + (<span class="keyword">const</span> Book&amp; lhs, <span class="keyword">const</span> Book&amp; rhs) &#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;friend function &quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> Book(lhs.price+rhs.price, lhs.num+rhs.num);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ostream&amp; <span class="keyword">operator</span> &lt;&lt; (ostream&amp; os, <span class="keyword">const</span> Book&amp; rhs)&#123;</span><br><span class="line">    os &lt;&lt; <span class="string">&quot;Book price: &quot;</span> &lt;&lt; rhs.price &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; <span class="string">&quot; num: &quot;</span> &lt;&lt; rhs.num;</span><br><span class="line">    <span class="keyword">return</span> os;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>reactor翻译过来是反应堆，reactor模式也叫dispatch模式。</p>
+<p>本文图片来自小林coding。</p>
+<h2 id="单reactor单线程模式"><a href="#单reactor单线程模式" class="headerlink" title="单reactor单线程模式"></a>单reactor单线程模式</h2><p><img src="C:\Users\HUAWEI\Desktop\webserver\docs\imgs\单reactor.png" alt="单reactor模式"></p>
+<p>单reactor模式就是一份之前写过的代码，只是在功能上将代码划分为Reactor、Acceptor和Handler三个部分，但是全部交给在一个进程/线程完成。其中Reactor进行请求连接、读写时间的侦听，并将这些事件按照类别进行分发。如果是建立连接事件，那么单独使用Acceptor来处理这部分逻辑，如果是处理读写请求事件，那么便调用相应的handler函数。</p>
+<p>这个模式只有单个线程，只是在代码上进行了功能划分，使用简单，一个典型的应用是redis(redis由于只和CPU和内存打交道，使用单线程单reactor也够用)。</p>
+<p>但存在一些问题：</p>
+<ul>
+<li>单个进程来执行事件侦听和事件处理，可能会给新的连接建立比较大的时延；</li>
+<li>单个reactor来处理所有的事件侦听在高并发下可能会崩溃；</li>
+<li>在Handler中将业务处理和一般性的读写动作混在一起，代码耦合性更高，也不利于业务逻辑的拓展；</li>
+<li>没有充分发挥多核处理器的性能。</li>
+</ul>
+<p>针对上述问题，便有了后续一些更多的reactor模式。</p>
+<h2 id="单reactor多线程模式"><a href="#单reactor多线程模式" class="headerlink" title="单reactor多线程模式"></a>单reactor多线程模式</h2><p><img src="C:\Users\HUAWEI\Desktop\webserver\docs\imgs\单reactor多线程.png" alt="单reactor多线程模式"></p>
+<p>单reactor在IO处理单元上没有进行啥改变，还是单reactor模式。所不用的是使用了线程池来将具体的业务逻辑进行剥离。这里使用线程池来避免多线程每次创建线程和销毁线程的开销，同时使用线程相比较于进程也更方便的进行通信。实际中也看不到单reactor多进程的设计模式，因为子进程与父进程双向通信比较繁琐。</p>
+<p>上述代码将业务逻辑从Handler中进行剥离，同时利用了多核，但IO部分的瓶颈还没解决，因此有多reactor多线程/进程模型。</p>
+<h2 id="多reactor多线程-进程模型"><a href="#多reactor多线程-进程模型" class="headerlink" title="多reactor多线程/进程模型"></a>多reactor多线程/进程模型</h2><p><img src="C:\Users\HUAWEI\Desktop\webserver\docs\imgs\多reactor多线程.png" alt="多reactor多线程"></p>
+<p>相比较于单reactor模式，这一版本有了两个变化。</p>
+<ul>
+<li>每个连接都将获得一个reactor负责，mainreactor只负责listenfd的侦听和建立连接的分发；</li>
+<li>将线程池改成了单个线程，每个线程负责一个连接。每个连接内部分为subreactor和handler两块，分别进行IO处理和具体事件处理。这一块没有将业务处理单独剥离为一个子线程/进程，因此不存在线程/进程间双向通信问题，处理起来更简单。memcache采用多reactor多线程方案，nginx采用多reactor多进程方案。</li>
+</ul>
+<p>不过这部分没有将业务逻辑进行剥离的做法个人不太喜欢，应该是能改进的。</p>
+<h2 id="proactor模式"><a href="#proactor模式" class="headerlink" title="proactor模式"></a>proactor模式</h2><p><strong>reactor是基于未完成IO事件</strong></p>
+<p><strong>proactor是基于已完成IO事件</strong></p>
+<p><img src="C:\Users\HUAWEI\Desktop\webserver\docs\imgs\proactor.png" alt="proactor"></p>
+<p>在 Linux 下的异步 I/O 是不完善的，<code>aio</code> 系列函数是由 POSIX 定义的异步操作接口，不是真正的操作系统级别支持的，而是在用户空间模拟出来的异步，并且仅仅支持基于本地文件的 aio 异步操作，网络编程中的 socket 是不支持的。因此现在讲proactor一般时说模拟proactor。这部分内容后续在详述。</p>
 
       
 
@@ -281,7 +286,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">C++</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">default</a>
         		</li>
       		
 		</ul>
@@ -337,7 +342,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/1dfa3723.html" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://xkwang.cn/post/d7864812.html" alt="微信分享二维码">
     </div>
 </div>
 
@@ -351,18 +356,18 @@
   
 <nav id="article-nav">
   
-    <a href="/post/ade28559.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/post/3c469569.html" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          C++模板编程
+          01webserver开篇
         
       </div>
     </a>
   
   
-    <a href="/post/d48ef435.html" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">C++中的优先队列</div>
+    <a href="/post/18f9231a.html" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">网络IO</div>
       <i class="icon-circle-right"></i>
     </a>
   
