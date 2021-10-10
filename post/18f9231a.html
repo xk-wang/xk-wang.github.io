@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://xkwang.cn/assets/blog/18f9231a/信号驱动.png">
 <meta property="og:image" content="http://xkwang.cn/assets/blog/18f9231a/异步IO.png">
 <meta property="article:published_time" content="2021-10-10T08:09:02.000Z">
-<meta property="article:modified_time" content="2021-10-10T08:34:28.823Z">
+<meta property="article:modified_time" content="2021-10-10T09:15:19.878Z">
 <meta property="article:author" content="xkwang">
 <meta property="article:tag" content="IO">
 <meta name="twitter:card" content="summary">
@@ -239,17 +239,17 @@
 <p>如果上述两个过程是按照先后顺序进行，那么这种IO模型就是同步的，如果说把数据准备好了，放到了用户态的缓冲区，然后去干其他的事情，至于数据拷贝和等待数据全部交给内核去处理，这种就是异步的。异步的一个典型应用就是日志系统。</p>
 <p>linux提供的同步读写函数read，write，recv，send, recvfrom, sendto。其中recv/send只能用于面向连接的服务，reccvfrom/sendto既能面向连接也能无连接。</p>
 <h2 id="同步阻塞IO"><a href="#同步阻塞IO" class="headerlink" title="同步阻塞IO"></a>同步阻塞IO</h2><div style="text-align: center">
-<img src="/assets/blog/18f9231a/同步阻塞.png" margin="0 auto" width="50%" height="50%"/>
+<img src="/assets/blog/18f9231a/同步阻塞.png" margin="0 auto" width="70%" height="70%"/>
 </div>
 
 <p>文件描述符设置为阻塞，之后使用read, write, recv, send, …</p>
 <h2 id="同步非阻塞IO"><a href="#同步非阻塞IO" class="headerlink" title="同步非阻塞IO"></a>同步非阻塞IO</h2><div style="text-align: center">
-<img src="/assets/blog/18f9231a/同步非阻塞.png" margin="0 auto" width="50%" height="50%"/>
+<img src="/assets/blog/18f9231a/同步非阻塞.png" margin="0 auto" width="70%" height="70%"/>
 </div>
 
 <p>需要不断地进行轮询查看是否能读或者能写，然后再去进行数据拷贝。</p>
 <h2 id="IO复用"><a href="#IO复用" class="headerlink" title="IO复用"></a>IO复用</h2><div style="text-align: center">
-<img src="/assets/blog/18f9231a/io复用.png" margin="0 auto" width="50%" height="50%"/>
+<img src="/assets/blog/18f9231a/io复用.png" margin="0 auto" width="70%" height="70%"/>
 </div>
 
 <p>IO复用中select poll都是同步阻塞，epoll LT模式一般是同步阻塞，ET模式一般是同步非阻塞。</p>
@@ -257,14 +257,14 @@
 <p>LT适用于传输数据少的应用，缓冲区一般不会满，搭配阻塞式使用，一般只需要读写一次，典型的如redis；</p>
 <p>ET适用于传输数据多的应用，缓冲区很容易满，只能非阻塞式使用（否则最后一次读写一定阻塞），一般循环读写，典型的如nginx。</p>
 <h2 id="信号驱动"><a href="#信号驱动" class="headerlink" title="信号驱动"></a>信号驱动</h2><div style="text-align: center">
-<img src="/assets/blog/18f9231a/信号驱动.png" margin="0 auto" width="50%" height="50%"/>
+<img src="/assets/blog/18f9231a/信号驱动.png" margin="0 auto" width="70%" height="70%"/>
 </div>
 
 <p>信号驱动模型在内核中注册一个SIGIO信号，当内核发现可读或者可写时回去调用相应的回调函数，这样用户态层面可以去处理其他事情。不过这个模型还是属于同步IO，因为具体回调函数中都是需要先来完成IO操作才可以去干其他事情。至于阻塞还是非阻塞和文件描述符的属性有关。</p>
 <p>重点：内核通知可读或者可写</p>
 <p>信号驱动模型看似很高效，但是如果io比较多的情况下会导致内核频繁发送信号，信号的开销也很大。</p>
 <h2 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h2><div style="text-align: center">
-<img src="/assets/blog/18f9231a/异步IO.png" margin="0 auto" width="50%" height="50%"/>
+<img src="/assets/blog/18f9231a/异步IO.png" margin="0 auto" width="70%" height="70%"/>
 </div>
 
 <p>aio_read或者aio_write仅仅只是操作用户态的事情，数据拷贝和数据就绪全部交给内核。引用程序发出一个读写指令后立即返回继续做其他事情，内核干完数据就绪和数据拷贝之后发出信号，会导致注册了该信号的回调函数被调用。显著特点是用户态发出读写命令后不干事了。异步一定是非阻塞的，否则最后一次读一定阻塞在信号处理函数里了，有点类似epoll的ET模式必须要是非阻塞的。</p>
